@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kaon_sa_kuan/screens/admin/admin_login.dart';
-import 'package:kaon_sa_kuan/screens/user/user_homepage.dart';
+//import 'package:kaon_sa_kuan/screens/user/user_homepage.dart';
 import 'package:kaon_sa_kuan/backend/services/auth_service.dart';
+import '../widgets/bottom_navbar.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -18,7 +18,6 @@ class _LandingPageState extends State<LandingPage>
   late Animation<Offset> _logoSlide;
   late Animation<double> _titleFade;
   late Animation<double> _buttonsFade;
-  late Animation<Offset> _buttonsSlide;
 
   @override
   void initState() {
@@ -30,44 +29,19 @@ class _LandingPageState extends State<LandingPage>
     );
 
     _logoFade = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-      ),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.5, curve: Curves.easeOut)),
     );
 
-    _logoSlide = Tween<Offset>(
-      begin: const Offset(0, -0.2),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-      ),
+    _logoSlide = Tween<Offset>(begin: const Offset(0, -0.1), end: Offset.zero).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.5, curve: Curves.easeOut)),
     );
 
     _titleFade = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.35, 0.65, curve: Curves.easeOut),
-      ),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.3, 0.7, curve: Curves.easeOut)),
     );
 
     _buttonsFade = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.6, 1.0, curve: Curves.easeOut),
-      ),
-    );
-
-    _buttonsSlide = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.6, 1.0, curve: Curves.easeOut),
-      ),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.6, 1.0, curve: Curves.easeOut)),
     );
 
     _controller.forward();
@@ -79,144 +53,110 @@ class _LandingPageState extends State<LandingPage>
     super.dispose();
   }
 
-  void _navigateTo(Widget page) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (_, animation, __) => page,
-        transitionsBuilder: (_, animation, __, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 350),
-      ),
-    );
+  void _navigateToHome() async {
+    // Optional: Keep your anonymous sign-in logic
+    await AuthService().signInAnonymously();
+    
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const BottomNavBar()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF8BC349),
+      // Background color matched to image_ce2c96.png
+      backgroundColor: const Color(0xFFF28544), 
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40.0),
-          child: Column(
-            children: [
-              const Spacer(flex: 3),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(flex: 3),
 
-              // Pig mascot asset
-              FadeTransition(
-                opacity: _logoFade,
-                child: SlideTransition(
-                  position: _logoSlide,
-                  child: Image.asset(
-                    'assets/images/pig_mascot.png',
-                    width: 160,
-                    height: 160,
-                    fit: BoxFit.contain,
-                  ),
+            // Pig mascot - Referencing image_ce2c96.png
+            FadeTransition(
+              opacity: _logoFade,
+              child: SlideTransition(
+                position: _logoSlide,
+                child: Image.asset(
+                  'assets/images/pig_mascot.png',
+                  width: 200,
+                  height: 200,
                 ),
               ),
+            ),
 
-              const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
-              // App name
-              FadeTransition(
-                opacity: _titleFade,
-                child: Text(
-                  'Kaon sa Kuan',
-                  style: GoogleFonts.aDLaMDisplay(
-                    fontSize: 34,
-                    color: const Color(0xFFEF5A28),
-                    letterSpacing: 0.5,
-                  ),
+            // App name with white color and bold style
+            FadeTransition(
+              opacity: _titleFade,
+              child: Text(
+                'Kaon sa Kuan',
+                style: GoogleFonts.poppins(
+                  fontSize: 42,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
+            ),
 
-              const Spacer(flex: 4),
+            const Spacer(flex: 4),
 
-              // Buttons
-              FadeTransition(
-                opacity: _buttonsFade,
-                child: SlideTransition(
-                  position: _buttonsSlide,
-                  child: Column(
-                    children: [
-                      _LandingButton(
-                          label: 'enter app',
-                          onTap: () async {
-                            await AuthService().signInAnonymously();
-
-                            if (mounted) {
-                              _navigateTo(const UserHomepage());
-                            }
-                          }),
-                      const SizedBox(height: 14),
-                      _LandingButton(
-                        label: 'admin',
-                        onTap: () => _navigateTo(const AdminLoginScreen()),
-                      ),
-                    ],
-                  ),
+            // Footer Section
+            FadeTransition(
+              opacity: _buttonsFade,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      "Can't decide where to eat?",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    const SizedBox(height: 12),
+                    _ActionButton(
+                      label: "Let's find a restaurant!",
+                      onTap: _navigateToHome,
+                    ),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 52),
-            ],
-          ),
+            ),
+            const SizedBox(height: 50),
+          ],
         ),
       ),
     );
   }
 }
 
-class _LandingButton extends StatefulWidget {
+class _ActionButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _LandingButton({required this.label, required this.onTap});
-
-  @override
-  State<_LandingButton> createState() => _LandingButtonState();
-}
-
-class _LandingButtonState extends State<_LandingButton> {
-  bool _pressed = false;
+  const _ActionButton({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.96 : 1.0,
-        duration: const Duration(milliseconds: 100),
-        child: Container(
-          width: double.infinity,
-          height: 54,
-          decoration: BoxDecoration(
-            color: const Color(0xFF3A2F2E),
-            borderRadius: BorderRadius.circular(32),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.18),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+    return SizedBox(
+      width: double.infinity,
+      height: 65,
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: const Color(0xFFF28544),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
           ),
-          alignment: Alignment.center,
-          child: Text(
-            widget.label,
-            style: GoogleFonts.dmSans(
-              fontSize: 17,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-              letterSpacing: 0.3,
-            ),
-          ),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
     );
