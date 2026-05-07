@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 //import 'package:kaon_sa_kuan/screens/user/user_homepage.dart';
-import 'package:kaon_sa_kuan/backend/services/auth_service.dart';
+import 'package:kaon_sa_kuan/data/services/auth_service.dart';
 import '../widgets/bottom_navbar.dart';
 
 class LandingPage extends StatefulWidget {
