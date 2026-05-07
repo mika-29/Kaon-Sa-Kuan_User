@@ -28,7 +28,7 @@ class _OrangeColorCollection{
   final healthyTag = const Color(0xFFD5EDDB); // MINT LEAF, for healthy / vegan tags
   final categoryChip = const Color(0xFFFCEBD5); // SOFT APRICOT, for category chips
   final promoElement = const Color(0xFFEDE6FB); // LAVENDER MIST, for promo / new items
-  final favoriteElement = const Color(0xFFFDDE7); // BLUSH BERRY, for favorites and hearts
+  final favoriteElement = const Color(0xFFFFDDE7); // BLUSH BERRY, for favorites and hearts
   final cancelButton = const Color(0xFF3A2F2E); // BROWN???
 
   // text colors
