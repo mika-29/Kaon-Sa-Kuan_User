@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../widgets/report_card.dart';
+import 'package:kaon_sa_kuan/models/report_data.dart';
+import 'package:kaon_sa_kuan/data/services/report_service.dart';
 
 class UserReportsPage extends StatefulWidget {
   const UserReportsPage({super.key});
@@ -13,10 +15,8 @@ class _UserReportsPageState extends State<UserReportsPage> {
   static const themeColor = Color(0xFFF28544);
   final TextEditingController _reportController = TextEditingController();
 
-  // Mock data — replace with Firebase stream later
-  final List<String> _reports = [
-    "Pwede po pa-remove ng Scarlet's? Matagal na po kasi sila close tapos sinuggest po siya ng app samin. Thank you po!",
-  ];
+  // Initialize report service
+  final ReportService _reportService = ReportService();
 
   @override
   void dispose() {
@@ -24,15 +24,13 @@ class _UserReportsPageState extends State<UserReportsPage> {
     super.dispose();
   }
 
-  void _submitReport() {
+  void _submitReport() async {
     final text = _reportController.text.trim();
     if (text.isEmpty) return;
 
-    setState(() {
-      _reports.insert(0, text); 
-      _reportController.clear();
-    });
-
+    // Send to Firebase
+    await _reportService.sendReport(text);
+    _reportController.clear();
     FocusScope.of(context).unfocus();
   }
 
@@ -73,44 +71,69 @@ class _UserReportsPageState extends State<UserReportsPage> {
                 ),
 
                 // Report count badge
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${_reports.length} reports',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                StreamBuilder<List<Report>>(
+                  stream: _reportService.getReports(),
+                  builder: (context, snapshot) {
+                    final count = snapshot.data?.length ?? 0;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '$count reports',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
           ),
 
-          //Report Cards 
+          //Report Cards
           Expanded(
-            child: _reports.isEmpty
-                ? Center(
+            child: StreamBuilder<List<Report>>(
+              stream: _reportService.getReports(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(color: themeColor));
+                }
+
+                final reports = snapshot.data ?? [];
+
+                if (reports.isEmpty) {
+                  return Center(
                     child: Text(
                       'No reports yet. Be the first!',
-                      style: GoogleFonts.poppins(
-                          color: Colors.grey, fontSize: 13),
+                      style: GoogleFonts.poppins(color: Colors.grey, fontSize: 13),
                     ),
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-                    itemCount: _reports.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 14),
-                    itemBuilder: (context, index) {
-                      return ReportCard(text: _reports[index]);
-                    },
-                  ),
+                  );
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                  itemCount: reports.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 14),
+                  itemBuilder: (context, index) {
+                    final report = reports[index];
+                    return ReportCard(
+                      text: report.message,
+                      timestamp: report.createdAt,
+                    );
+                  },
+                );
+              },
+            ),
           ),
 
           //Input
