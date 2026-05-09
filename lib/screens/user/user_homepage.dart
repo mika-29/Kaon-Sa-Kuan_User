@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'clickResto.dart';
+import 'decisions_page.dart';
 import '../../models/restaurant_data.dart';
 import '../../widgets/restaurant_card.dart';
 import '../../widgets/speech_bubble.dart';
@@ -86,13 +87,19 @@ class _UserHomepageState extends State<UserHomepage> {
                       ),
                     ),
                     // Pig mascot
-                    Transform.translate(
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context, 
+                        MaterialPageRoute(builder: (_) => const FoodDecisionMaker()),
+                      ),
+                    child: Transform.translate(
                       offset: const Offset(15, 30), // pops slightly below header
                       child: CircleAvatar(
                         radius: 45,
                         backgroundColor: Colors.white.withOpacity(0.0),
                         backgroundImage:
                             const AssetImage('assets/images/pig_mascot.png'),
+                        ),
                       ),
                     ),
                   ],

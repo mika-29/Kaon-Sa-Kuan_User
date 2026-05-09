@@ -82,7 +82,7 @@ class _LandingPageState extends State<LandingPage>
                 position: _logoSlide,
                 child: Image.asset(
                   'assets/images/pig_mascot.png',
-                  width: 200,
+                  width: 250,
                   height: 200,
                 ),
               ),

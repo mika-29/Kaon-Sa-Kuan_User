@@ -37,7 +37,7 @@ class RestaurantCard extends StatelessWidget {
         children: [
           // Image placeholder
           Container(
-            height: 150,
+            height: 110,
             decoration: const BoxDecoration(
               color: Color(0xFFFDF0E8),
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
