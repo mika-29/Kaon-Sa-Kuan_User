@@ -9,6 +9,8 @@ class QuestionScreen extends StatelessWidget {
   final void Function(String) onChoiceTap;
   final VoidCallback onBack;
   final bool isTiebreaker;
+  final VoidCallback? onPrevious;
+  final VoidCallback? onNext; // optional — choices handle next normally
 
   const QuestionScreen({
     super.key,
@@ -19,6 +21,8 @@ class QuestionScreen extends StatelessWidget {
     required this.onChoiceTap,
     required this.onBack,
     required this.isTiebreaker,
+    required this.onPrevious,
+    required this.onNext, 
   });
 
   static const themeColor = Color(0xFFF28544);
@@ -44,15 +48,40 @@ class QuestionScreen extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Question counter
-                Center(
-                  child: Text(
-                    'Question $currentIndex/$total',
-                    style: GoogleFonts.poppins(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: onPrevious,
+                      child: Icon(
+                        Icons.chevron_left,
+                        size: 28,
+                        color: onPrevious != null ? Colors.black87 : Colors.transparent,
+                      ),
                     ),
-                  ),
+
+                    const SizedBox(width: 8),
+
+                    Text(
+                      'Question $currentIndex/$total',
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    GestureDetector(
+                      onTap: onNext,
+                      child: Icon(
+                        Icons.chevron_right,
+                        size: 28,
+                        color: onNext != null ? Colors.black87 : Colors.transparent,
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 8),
@@ -89,7 +118,7 @@ class QuestionScreen extends StatelessWidget {
                 Transform.translate(
                   offset: const Offset(0, -15), // pops slightly below bubble
                     child: CircleAvatar(
-                      radius: 110,
+                      radius: 111,
                       backgroundColor: Colors.transparent,
                       backgroundImage: const AssetImage('assets/images/pig_mascot.png'),
                       ),
@@ -104,16 +133,16 @@ class QuestionScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: themeColor,
             borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(28),
+              top: Radius.circular(25),
             ),
           ),
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 15),
           child: GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 10,
             childAspectRatio: 2.4,
             children: choices
                 .map((choice) => _ChoiceButton(

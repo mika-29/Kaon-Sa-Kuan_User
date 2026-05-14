@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/modal_confirm.dart';
 
 class AddRestaurantPage extends StatefulWidget {
   const AddRestaurantPage({super.key});
@@ -201,16 +202,37 @@ class _AddRestaurantPage extends State<AddRestaurantPage> {
                   ),
                   child: ElevatedButton(
                    onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Frontend preview only'),
+                    showDialog(
+                      context: context,
+                     builder: (_) => AdminConfirmModal(
+                            icon: Icons.restaurant_rounded,
+                            iconColor: kApproveGreen,
+                            iconBgColor: kApproveGreenBg,
+
+                            title: 'Submit Restaurant?',
+                            message:
+                                'Are you sure you want to submit this restaurant for review?',
+
+                            confirmLabel: 'Yes, submit it.',
+                            confirmColor: kApproveGreen,
+                            confirmBgColor: kApproveGreenBg,
+
+                            onConfirm: () {
+                              Navigator.pop(context);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Frontend preview only'),
+                                ),
+                              );
+
+                              print('Restaurant Name: ${_nameController.text}');
+                              print('Description: ${_descriptionController.text}');
+                              print('Location: ${_locationController.text}');
+                              print('Selected Tags: $_selectedTags');
+                            },
                           ),
                         );
-
-                        print('Restaurant Name: ${_nameController.text}');
-                        print('Description: ${_descriptionController.text}');
-                        print('Location: ${_locationController.text}');
-                        print('Selected Tags: $_selectedTags');
                       },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: warmTangerine,
